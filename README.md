@@ -8,5 +8,6 @@ This is a Udemy course
 
 # Packages installed:
 ### For Section 8:
-#### npm install --save redux react-redux react-navigation react-navigation-stack react-navigation-header-buttons
-#### expo install react-native-gesture-handler react-native-reanimated
+#### redux react-redux react-navigation react-navigation-stack react-navigation-header-buttons
+#### !!! expo install react-native-gesture-handler react-native-reanimated
+#### expo-font
