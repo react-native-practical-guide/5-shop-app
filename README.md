@@ -11,3 +11,4 @@ This is a Udemy course
 #### redux react-redux react-navigation react-navigation-stack react-navigation-header-buttons
 #### !!! expo install react-native-gesture-handler react-native-reanimated
 #### expo-font
+#### npm install --save-dev redux-devtools-extension 
