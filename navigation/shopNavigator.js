@@ -4,7 +4,7 @@ import { Platform } from 'react-native';
 
 import ProductsOverviewScreen from '../screens/shop/ProductsOverviewScreen';
 import ProductDetailScreen from '../screens/shop/ProductDetailScreen';
-import Colors from '../constants/Colors';
+import Colours from '../constants/Colours';
 
 // Result is a React component.
 const ProductsNavigator = createStackNavigator(
@@ -15,9 +15,9 @@ const ProductsNavigator = createStackNavigator(
 	{
 		defaultNavigationOptions: {
 			headerStyle: {
-				backgroundColor: Platform.OS === 'android' ? Colors.maroon : ''
+				backgroundColor: Platform.OS === 'android' ? Colours.maroon : ''
 			},
-			headerTintColor: Platform.OS === 'android' ? 'white' : Colors.maroon 
+			headerTintColor: Platform.OS === 'android' ? 'white' : Colours.maroon 
 		}
 	}
 );

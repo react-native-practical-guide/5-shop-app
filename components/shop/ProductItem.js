@@ -10,7 +10,7 @@ import {
 	Platform
 } from 'react-native';
 
-import Colors from '../../constants/Colors';
+import Colours from '../../constants/Colours';
 
 const ProductItem = (props) => {
 	let TouchableComp = TouchableOpacity;
@@ -30,8 +30,8 @@ const ProductItem = (props) => {
 							<Text style={styles.price}>{props.price.toFixed(2)}</Text>
 						</View>
 						<View style={styles.actions}>
-							<Button color={Colors.maroon} title="View Details" onPress={props.onViewDetail} />
-							<Button color={Colors.maroon} title="To Cart" onPress={props.onAddToCard} />
+							<Button color={Colours.maroon} title="View Details" onPress={props.onViewDetail} />
+							<Button color={Colours.maroon} title="To Cart" onPress={props.onAddToCard} />
 						</View>
 					</View>
 				</TouchableComp>
