@@ -3,19 +3,21 @@ import { createStackNavigator } from 'react-navigation-stack';
 import { Platform } from 'react-native';
 
 import ProductsOverviewScreen from '../screens/shop/ProductsOverviewScreen';
+import ProductDetailScreen from '../screens/shop/ProductDetailScreen';
 import Colors from '../constants/Colors';
 
 // Result is a React component.
 const ProductsNavigator = createStackNavigator(
 	{
-		productsOverview: ProductsOverviewScreen
+		ProductsOverview: ProductsOverviewScreen,
+		ProductDetail: ProductDetailScreen
 	},
 	{
 		defaultNavigationOptions: {
 			headerStyle: {
-				backgroundColor: Platform.OS === 'android' ? Colors.moccasin : ''
+				backgroundColor: Platform.OS === 'android' ? Colors.maroon : ''
 			},
-			headerTintColor: Platform.OS === 'android' ? 'white' : Colors.darkblue 
+			headerTintColor: Platform.OS === 'android' ? 'white' : Colors.maroon 
 		}
 	}
 );

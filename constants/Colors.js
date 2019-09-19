@@ -4,6 +4,7 @@ export default {
     silver: '#C0C0C0',
     dimgray: '#696969',
     moccasin: '#FFE4B5',
+    maroon: '#800000',
     lightyellow: '#FFFFE0',
     lightskyblue: '#87CEFA',
     deepskyblue: '#00BFFF',
