@@ -9,4 +9,4 @@ const styles = StyleSheet.create({
 
 })
  
-export default ProductItem;
+export default Template;
