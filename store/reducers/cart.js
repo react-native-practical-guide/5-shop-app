@@ -1,4 +1,4 @@
-import { ADD_TO_CARD } from '../actions/cart';
+import { ADD_TO_CARD, REMOVE_FROM_CARD } from '../actions/cart';
 import CartItem from '../../models/cart-item';
 
 const initialState = {
@@ -16,7 +16,7 @@ export default (state = initialState, action) => {
 			let updatedOrNewCardItem;
 			// If this product is allready in Card...
 			// items[addedProduct.id] = access or set a dynamic prop.
-			if (state.items[addedProduct.id]) { 
+			if (state.items[addedProduct.id]) {
 				// Already have the item in the card
 				updatedOrNewCardItem = new CartItem(
 					state.items[addedProduct.id].quantity + 1,
@@ -32,6 +32,28 @@ export default (state = initialState, action) => {
 				...state, // actually redundant
 				items: { ...state.items, [addedProduct.id]: updatedOrNewCardItem },
 				totalAmount: state.totalAmount + prodPrice
+			};
+		case REMOVE_FROM_CARD:
+			const selectedCartItem = state.items[action.pid];
+			const currentQty = selectedCartItem.quantity;
+			let updatedCartItems;
+			if (currentQty > 1) {
+				// need to reduce it not erase it
+				const updatedCartItem = new CartItem(
+					selectedCartItem.quantity - 1,
+					selectedCartItem.productPrice,
+					selectedCartItem.productTitle,
+					selectedCartItem.sum - selectedCartItem.productPrice
+				);
+				updatedCartItems = { ...state.items, [action.pid]: updatedCartItem };
+			} else {
+				updatedCartItems = { ...state.items };
+				delete updatedCartItems[action.pid];
+			}
+			return {
+				...state,
+				items: updatedCartItems,
+				totalAmount: state.totalAmount - selectedCartItem.productPrice
 			};
 		default:
 			return state;
