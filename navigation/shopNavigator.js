@@ -5,7 +5,7 @@ import { Platform } from 'react-native';
 import ProductsOverviewScreen from '../screens/shop/ProductsOverviewScreen';
 import ProductDetailScreen from '../screens/shop/ProductDetailScreen';
 import Colours from '../constants/Colours';
-import CartScreen from '../screens/shop/CardScreen';
+import CartScreen from '../screens/shop/CartScreen';
 
 // Result is a React component.
 const ProductsNavigator = createStackNavigator(
