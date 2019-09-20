@@ -12,3 +12,4 @@ This is a Udemy course
 #### !!! expo install react-native-gesture-handler react-native-reanimated
 #### expo-font
 #### npm install --save-dev redux-devtools-extension 
+#### moment (for formating dates)
