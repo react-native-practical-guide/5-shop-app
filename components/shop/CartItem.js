@@ -11,10 +11,11 @@ const CartItem = (props) => {
         </View>
         <View style={styles.itemData}>
             <Text style={styles.mainText}>${props.amount.toFixed(2)} </Text>
-            <TouchableOpacity style={styles.deleteButton} onPress={props.onRemove}>
+            {/* deletable is becuase we do not want to render the icon in OrderItem */}
+            {props.deletable && <TouchableOpacity style={styles.deleteButton} onPress={props.onRemove}>
                 <Ionicons name={Platform.OS === 'android' ? 'md-trash' : 'ios-trash'} 
                 size={23} color='red' />
-            </TouchableOpacity>
+            </TouchableOpacity>}
         </View>
     </View>
     );
