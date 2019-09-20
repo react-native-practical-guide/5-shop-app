@@ -6,6 +6,7 @@ import { FlatList } from 'react-native-gesture-handler';
 
 import CartItem from '../../components/shop/CartItem';
 import * as cartActions from '../../store/actions/cart';
+import * as ordersActions from '../../store/actions/orders';
 
 const CartScreen = (props) => {
 	const dispatch = useDispatch();
@@ -32,7 +33,9 @@ const CartScreen = (props) => {
 				<Text style={styles.summaryText}>
 					Total: <Text style={styles.amount}>${cartTotalAmount.toFixed(2)}</Text>
 				</Text>
-				<Button color={Colours.chocolate} title="Order Now" disabled={cartItems.length === 0} />
+				{/* NOTE: cartItems is an array!!! */}
+				<Button color={Colours.chocolate} title="Order Now" disabled={cartItems.length === 0} 
+				onPress={() => dispatch(ordersActions.addOrder(cartItems, cartTotalAmount))} />
 			</View>
 				<FlatList
 					data={cartItems}
