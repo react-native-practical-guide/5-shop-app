@@ -1,7 +1,9 @@
+import React from 'react'
+import { Platform } from 'react-native';
 import { createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createDrawerNavigator } from 'react-navigation-drawer';
-import { Platform } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 import ProductsOverviewScreen from '../screens/shop/ProductsOverviewScreen';
 import ProductDetailScreen from '../screens/shop/ProductDetailScreen';
@@ -14,40 +16,61 @@ const defaultNavOptions = {
 		backgroundColor: Platform.OS === 'android' ? Colours.maroon : ''
 	},
 	headerTitleStyle: {
-		fontFamily: 'open-sans-bold',
+		fontFamily: 'open-sans-bold'
 	},
 	headerBackTitleStyle: {
-		fontFamily: 'open-sans',
+		fontFamily: 'open-sans'
 	},
-	headerTintColor: Platform.OS === 'android' ? 'white' : Colours.maroon 
-}
+	headerTintColor: Platform.OS === 'android' ? 'white' : Colours.maroon
+};
 
 // Result is a React component.
 const ProductsNavigator = createStackNavigator(
 	{
 		ProductsOverview: ProductsOverviewScreen,
 		ProductDetail: ProductDetailScreen,
-		Cart: CartScreen,
+		Cart: CartScreen
 		// Orders: OrdersScreen, It is not part of this stack. We reach it from the sideDrawer.
 	},
 	{
+		navigationOptions: {
+			drawerIcon: (drawerConfig) => (
+				<Ionicons name={Platform.OS === 'android' ? 'md-cart' : 'ios-cart'}
+				size={23} 
+				color={drawerConfig.tintColor} />
+			)
+		},
 		defaultNavigationOptions: defaultNavOptions
 	}
 );
 
-const OrdersNavigator = createStackNavigator({
-	Orders: OrdersScreen
-}, {
-	defaultNavigationOptions: defaultNavOptions
-})
-
-const ShopNavigator = createDrawerNavigator({
-	Products: ProductsNavigator,
-	Orders: OrdersNavigator
-}, {
-	contentOptions: {
-		activeTintColor: Colours.chocolate
+const OrdersNavigator = createStackNavigator(
+	{
+		Orders: OrdersScreen
+	},
+	{
+		// navigationOptions only apply if this Screen here, belongs to another Navigator
+		navigationOptions: {
+			drawerIcon: (drawerConfig) => (
+				<Ionicons name={Platform.OS === 'android' ? 'md-list' : 'ios-list'}
+				size={23} 
+				color={drawerConfig.tintColor} />
+			)
+		},
+		defaultNavigationOptions: defaultNavOptions
 	}
-})
+);
+
+const ShopNavigator = createDrawerNavigator(
+	{
+		Products: ProductsNavigator,
+		Orders: OrdersNavigator
+	},
+	{
+		contentOptions: {
+			activeTintColor: Colours.chocolate
+		}
+	}
+);
 
 export default createAppContainer(ShopNavigator);
