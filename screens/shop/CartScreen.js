@@ -24,7 +24,7 @@ const CartScreen = (props) => {
 				sum: state.cart.items[key].sum
 			});
 		}
-		return transformedCartItems;
+		return transformedCartItems.sort((a,b) => a.productId > b.productId ? 1 : -1);
 	});
 
 	return (
@@ -44,7 +44,7 @@ const CartScreen = (props) => {
 						<CartItem quantity={itemData.item.quantity} 
 						title={itemData.item.productTitle} 
 						amount={itemData.item.sum}
-						deletable
+						deletable // Needed to show the delete button.
 						onRemove={() => dispatch(cartActions.removeFromCart(itemData.item.productId))}
 						/>
 					)}

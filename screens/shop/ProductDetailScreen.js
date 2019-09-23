@@ -37,11 +37,11 @@ const styles = StyleSheet.create({
 	image: {
 		width: '100%',
 		height: 300
-	},
-	// So the button does not stretch in android.
+	},	
 	actions: {
 		marginVertical: 10,
-		alignItems: 'center'
+		alignItems: 'center' // So the button does not stretch in android.
+		// width: '40%'
 	},
 	price: {
 		fontFamily: 'open-sans-bold',

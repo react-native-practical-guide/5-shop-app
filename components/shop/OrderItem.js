@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, Button, StyleSheet } from 'react-native';
+import { View, Text, Button, StyleSheet } from 'react-native';
 
 import CartItem from './CartItem';
 import Colours from '../../constants/Colours';
