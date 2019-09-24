@@ -17,21 +17,25 @@ const EditProductScreen = (props) => {
 	const [ price, setPrice ] = useState('');
 	const [ description, setDescription ] = useState(editedProduct ? editedProduct.description : '');
 
-    const dispatch = useDispatch();
+	const dispatch = useDispatch();
 
-    // Rap it with useCallback to avoid infinite loop.
-	const submitHandler = useCallback(() => {
-        if (editedProduct) {
-            dispatch(productActions.updateProduct(prodId, title, description, imageUrl))
-        } else
-        // Put a + to price to convert it from a string to a number so the .toFixed(2) 
-        // function works (in ProductsOverviewScreen) !
-		dispatch(productActions.createProduct(title, description, imageUrl, +price))
-	},[dispatch, prodId, title, imageUrl, price, description]);
+	// Rap it with useCallback to avoid infinite loop.
+	const submitHandler = useCallback(
+		() => {
+			if (editedProduct) {
+				dispatch(productActions.updateProduct(prodId, title, description, imageUrl));
+			} else
+				// Put a + to price to convert it from a string to a number so the .toFixed(2)
+				// function works (in ProductsOverviewScreen) !
+				dispatch(productActions.createProduct(title, description, imageUrl, +price));
+			props.navigation.goBack();
+		},
+		[ dispatch, prodId, title, imageUrl, price, description ]
+	);
 
 	useEffect(
 		() => {
-			props.navigation.setParams({submit: submitHandler});
+			props.navigation.setParams({ submit: submitHandler });
 		},
 		[ submitHandler ]
 	);
