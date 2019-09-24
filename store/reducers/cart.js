@@ -1,6 +1,7 @@
 import { ADD_TO_CARD, REMOVE_FROM_CARD } from '../actions/cart';
 import { ADD_ORDER } from '../actions/orders';
 import CartItem from '../../models/cart-item';
+import { DELETE_PRODUCT } from '../actions/products';
 
 const initialState = {
 	items: {},
@@ -55,8 +56,22 @@ export default (state = initialState, action) => {
 				items: updatedCartItems,
 				totalAmount: state.totalAmount - selectedCartItem.productPrice
 			};
-			case ADD_ORDER:
-				return initialState; // Just clearing the cart!
+		case ADD_ORDER:
+			return initialState; // Just clearing the cart!
+		case DELETE_PRODUCT:
+			// If item doesn't exist...
+			if (!state.items[action.pid]) {
+				return state;
+			}
+			const updatedItems = { ...state.items };
+			// In case the item is allready in the cart...
+			itemTotal = state.items[action.pid].sum;
+			delete updatedItems[action.pid];
+			return {
+				...state,
+				items: updatedItems,
+				totalAmount: state.totalAmount - itemTotal
+			};
 		default:
 			return state;
 	}
