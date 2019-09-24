@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
-import { useSelector, useDispatch} from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import Colours from '../../constants/Colours';
 import { FlatList } from 'react-native-gesture-handler';
 
@@ -24,38 +24,44 @@ const CartScreen = (props) => {
 				sum: state.cart.items[key].sum
 			});
 		}
-		return transformedCartItems.sort((a,b) => a.productId > b.productId ? 1 : -1);
+		return transformedCartItems.sort((a, b) => (a.productId > b.productId ? 1 : -1));
 	});
 
 	return (
 		<View style={styles.screen}>
 			<View style={styles.summary}>
 				<Text style={styles.summaryText}>
-					Total: <Text style={styles.amount}>${cartTotalAmount.toFixed(2)}</Text>
+					{/* Use Math.round etc to remove the -0... */}
+					Total: <Text style={styles.amount}>${Math.round(cartTotalAmount.toFixed(2) * 100) / 100}</Text>
 				</Text>
 				{/* NOTE: cartItems is an array!!! */}
-				<Button color={Colours.chocolate} title="Order Now" disabled={cartItems.length === 0} 
-				onPress={() => dispatch(ordersActions.addOrder(cartItems, cartTotalAmount))} />
+				<Button
+					color={Colours.chocolate}
+					title="Order Now"
+					disabled={cartItems.length === 0}
+					onPress={() => dispatch(ordersActions.addOrder(cartItems, cartTotalAmount))}
+				/>
 			</View>
-				<FlatList
-					data={cartItems}
-					keyExtractor={(item) => item.productId}
-					renderItem={(itemData) => (
-						<CartItem quantity={itemData.item.quantity} 
-						title={itemData.item.productTitle} 
+			<FlatList
+				data={cartItems}
+				keyExtractor={(item) => item.productId}
+				renderItem={(itemData) => (
+					<CartItem
+						quantity={itemData.item.quantity}
+						title={itemData.item.productTitle}
 						amount={itemData.item.sum}
 						deletable // Needed to show the delete button.
 						onRemove={() => dispatch(cartActions.removeFromCart(itemData.item.productId))}
-						/>
-					)}
-				/>
+					/>
+				)}
+			/>
 		</View>
 	);
 };
 
 CartScreen.navigationOptions = {
-    headerTitle: 'Your Orders'
-}
+	headerTitle: 'Your Orders'
+};
 
 const styles = StyleSheet.create({
 	screen: {
