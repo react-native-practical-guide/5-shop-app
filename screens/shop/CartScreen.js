@@ -1,12 +1,13 @@
 import React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
-import Colours from '../../constants/Colours';
 import { FlatList } from 'react-native-gesture-handler';
 
 import CartItem from '../../components/shop/CartItem';
 import * as cartActions from '../../store/actions/cart';
 import * as ordersActions from '../../store/actions/orders';
+import Card from '../../components/UI/Card';
+import Colours from '../../constants/Colours';
 
 const CartScreen = (props) => {
 	const dispatch = useDispatch();
@@ -29,7 +30,7 @@ const CartScreen = (props) => {
 
 	return (
 		<View style={styles.screen}>
-			<View style={styles.summary}>
+			<Card style={styles.summary}>
 				<Text style={styles.summaryText}>
 					{/* Use Math.round etc to remove the -0... */}
 					Total: <Text style={styles.amount}>${Math.round(cartTotalAmount.toFixed(2) * 100) / 100}</Text>
@@ -41,7 +42,7 @@ const CartScreen = (props) => {
 					disabled={cartItems.length === 0}
 					onPress={() => dispatch(ordersActions.addOrder(cartItems, cartTotalAmount))}
 				/>
-			</View>
+			</Card>
 			<FlatList
 				data={cartItems}
 				keyExtractor={(item) => item.productId}
@@ -73,20 +74,15 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		marginBottom: 20,
 		padding: 10,
-		shadowColor: 'black',
-		shadowOpacity: 0.26,
-		shadowOffset: { width: 0, height: 2 },
-		shadowRadius: 8,
-		elevation: 5,
-		borderRadius: 10,
-		backgroundColor: 'white'
 	},
 	summaryText: {
 		fontFamily: 'open-sans-bold',
 		fontSize: 18,
 		color: Colours.chocolate
 	},
-	amount: {}
+	amount: {
+		color: Colours.chocolate
+	}
 });
 
 export default CartScreen;

@@ -6,23 +6,22 @@ import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import CustomHeaderButton from '../../components/UI/CustomHeaderButton';
 import ProductItem from '../../components/shop/ProductItem';
 import Colours from '../../constants/Colours';
-import * as productsActions from '../../store/actions/products'
+import * as productsActions from '../../store/actions/products';
 
 const UserProductsScreen = (props) => {
 	const dispatch = useDispatch();
 	const userProducts = useSelector((state) => state.products.userProducts);
 
-	const editProductHandler = id => {
-		props.navigation.navigate('EditProduct', {productId: id})
-	}
+	const editProductHandler = (id) => {
+		props.navigation.navigate('EditProduct', { productId: id });
+	};
 
 	const deleteHandler = (id) => {
-		Alert.alert('Delete product!', 'Are you sure you want to delete this product?',
-		[
-			{text: 'NO', style: 'default'},
-			{text: 'YES', style: 'destructive', onPress:() => dispatch(productsActions.deleteProduct(id))}
-		] )
-	}
+		Alert.alert('Delete product!', 'Are you sure you want to delete this product?', [
+			{ text: 'NO', style: 'default' },
+			{ text: 'YES', style: 'destructive', onPress: () => dispatch(productsActions.deleteProduct(id)) }
+		]);
+	};
 	return (
 		<FlatList
 			data={userProducts}
@@ -32,13 +31,9 @@ const UserProductsScreen = (props) => {
 					image={itemData.item.imageUrl}
 					title={itemData.item.title}
 					price={itemData.item.price}
-				onSelect={() => editProductHandler(itemData.item.id)}
+					onSelect={() => editProductHandler(itemData.item.id)}
 				>
-					<Button
-						color={Colours.maroon}
-						title="Edit"
-						onPress={() => editProductHandler(itemData.item.id)}
-					/>
+					<Button color={Colours.maroon} title="Edit" onPress={() => editProductHandler(itemData.item.id)} />
 					<Button
 						color={Colours.maroon}
 						title="Delete"
