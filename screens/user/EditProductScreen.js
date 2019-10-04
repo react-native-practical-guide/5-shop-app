@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, ScrollView, TextInput, Platform, Text, StyleSheet } from 'react-native';
+import { View, ScrollView, TextInput, Platform, Text, StyleSheet, Alert } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 
@@ -13,6 +13,7 @@ const EditProductScreen = (props) => {
 	const editedProduct = useSelector((state) => state.products.userProducts.find((prod) => prod.id === prodId));
 
 	const [ title, setTitle ] = useState(editedProduct ? editedProduct.title : '');
+	const [ titleIsValid, setTitleIsValid ] = useState(false);
 	const [ imageUrl, setImageUrl ] = useState(editedProduct ? editedProduct.imageUrl : '');
 	const [ price, setPrice ] = useState('');
 	const [ description, setDescription ] = useState(editedProduct ? editedProduct.description : '');
@@ -22,6 +23,10 @@ const EditProductScreen = (props) => {
 	// Rap it with useCallback to avoid infinite loop.
 	const submitHandler = useCallback(
 		() => {
+			if (!titleIsValid) {
+				Alert.alert('Invalid input', 'Please check the error in the form', [{text: 'OK'}])
+				return;
+			}
 			if (editedProduct) {
 				dispatch(productActions.updateProduct(prodId, title, description, imageUrl));
 			} else
@@ -30,7 +35,7 @@ const EditProductScreen = (props) => {
 				dispatch(productActions.createProduct(title, description, imageUrl, +price));
 			props.navigation.goBack();
 		},
-		[ dispatch, prodId, title, imageUrl, price, description ]
+		[ dispatch, prodId, title, imageUrl, price, description, titleIsValid ]
 	);
 
 	useEffect(
@@ -39,11 +44,32 @@ const EditProductScreen = (props) => {
 		},
 		[ submitHandler ]
 	);
+
+	const titleChangeHandler = (text) => {
+		if (text.trim().length < 0) {
+			setTitleIsValid(false);
+		} else {
+			setTitleIsValid(true);
+		}
+		setTitle(text);
+	};
+
 	return (
 		<ScrollView style={styles.form}>
 			<View style={styles.formControl}>
 				<Text style={styles.label}>Title</Text>
-				<TextInput style={styles.input} value={title} onChangeText={(text) => setTitle(text)} />
+				<TextInput
+					style={styles.input}
+					value={title}
+					onChangeText={titleChangeHandler}
+					keyboardType="default"
+					autoCapitalize="sentences"
+					autoCorrect
+					returnKeyType="next"
+					onEndEditing={() => console.log('onEndEditing')}
+					onSubmitEditing={() => console.log('onSubmitEditing')}
+				/>
+				{!titleIsValid && <Text>Please enter a valid title</Text>}
 			</View>
 			<View style={styles.formControl}>
 				<Text style={styles.label}>Image</Text>
@@ -53,12 +79,23 @@ const EditProductScreen = (props) => {
 			{editedProduct ? null : (
 				<View style={styles.formControl}>
 					<Text style={styles.label}>Price</Text>
-					<TextInput style={styles.input} value={price} onChangeText={(text) => setPrice(text)} />
+					<TextInput
+						style={styles.input}
+						value={price}
+						onChangeText={(text) => setPrice(text)}
+						keyboardType="numeric"
+					/>
 				</View>
 			)}
 			<View style={styles.formControl}>
 				<Text style={styles.label}>Description</Text>
-				<TextInput style={styles.input} value={description} onChangeText={(text) => setDescription(text)} />
+				{/* For keyboardType check the docs form Platform compatibility */}
+				<TextInput
+					style={styles.input}
+					value={description}
+					onChangeText={(text) => setDescription(text)}
+					keyboardType="numeric"
+				/>
 			</View>
 		</ScrollView>
 	);
