@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useReducer } from 'react';
 import { View, ScrollView, TextInput, Platform, Text, StyleSheet, Alert } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
@@ -6,36 +6,84 @@ import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import CustomHeaderButton from '../../components/UI/CustomHeaderButton';
 import * as productActions from '../../store/actions/products';
 
+const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE';
+
+const formReducer = (state, action) => {
+	if (action.type === FORM_INPUT_UPDATE) {
+		const updatedValues = {
+			...state.inputValues,
+			[action.input]: action.value
+		};
+		const updatedValidities = {
+			...state.inputValidities,
+			[action.input]: action.isValid
+		};
+		let updatedFormIsValid = true;
+		for (const key in updatedValidities) {
+			updatedFormIsValid = updatedFormIsValid && updatedValidities[key];
+		}
+		return {
+			formIsValid: updatedFormIsValid,
+			inputValues: updatedValues,
+			inputValidities: updatedValidities
+		};
+	}
+	return state;
+};
+
 const EditProductScreen = (props) => {
 	const prodId = props.navigation.getParam('productId');
 	// If productId is not set (if we press the add button in UserProductScreen)
 	// then editedProduct will be undifined. But that is OK.
 	const editedProduct = useSelector((state) => state.products.userProducts.find((prod) => prod.id === prodId));
 
-	const [ title, setTitle ] = useState(editedProduct ? editedProduct.title : '');
-	const [ titleIsValid, setTitleIsValid ] = useState(false);
-	const [ imageUrl, setImageUrl ] = useState(editedProduct ? editedProduct.imageUrl : '');
-	const [ price, setPrice ] = useState('');
-	const [ description, setDescription ] = useState(editedProduct ? editedProduct.description : '');
-
 	const dispatch = useDispatch();
 
+	const [ formState, dispatchFormState ] = useReducer(formReducer, {
+		inputValues: {
+			title: editedProduct ? editedProduct.title : '',
+			imageUrl: editedProduct ? editedProduct.imageUrl : '',
+			description: editedProduct ? editedProduct.description : '',
+			price: ''
+		},
+		inputValidities: {
+			title: editedProduct ? true : false,
+			imageUrl: editedProduct ? true : false,
+			description: editedProduct ? true : false,
+			price: editedProduct ? true : false
+		},
+		formIsValid: editedProduct ? true : false
+	});
 	// Rap it with useCallback to avoid infinite loop.
 	const submitHandler = useCallback(
 		() => {
-			if (!titleIsValid) {
-				Alert.alert('Invalid input', 'Please check the error in the form', [{text: 'OK'}])
+			if (!formState.formIsValid) {
+				Alert.alert('Invalid input', 'Please check the error in the form', [ { text: 'OK' } ]);
 				return;
 			}
 			if (editedProduct) {
-				dispatch(productActions.updateProduct(prodId, title, description, imageUrl));
+				dispatch(
+					productActions.updateProduct(
+						prodId,
+						formState.inputValues.title,
+						formState.inputValues.description,
+						formState.inputValues.imageUrl
+					)
+				);
 			} else
 				// Put a + to price to convert it from a string to a number so the .toFixed(2)
 				// function works (in ProductsOverviewScreen) !
-				dispatch(productActions.createProduct(title, description, imageUrl, +price));
+				dispatch(
+					productActions.createProduct(
+						formState.inputValues.title,
+						formState.inputValues.description,
+						formState.inputValues.imageUrl,
+						+formState.inputValues.price
+					)
+				);
 			props.navigation.goBack();
 		},
-		[ dispatch, prodId, title, imageUrl, price, description, titleIsValid ]
+		[ dispatch, prodId, formState ]
 	);
 
 	useEffect(
@@ -45,35 +93,30 @@ const EditProductScreen = (props) => {
 		[ submitHandler ]
 	);
 
-	const titleChangeHandler = (text) => {
-		if (text.trim().length < 0) {
-			setTitleIsValid(false);
-		} else {
-			setTitleIsValid(true);
+	const textChangeHandler = (inputIdentifier, text) => {
+		let isValid = false;
+		if (text.trim().length > 0) {
+			isValid = true;
 		}
-		setTitle(text);
+
+		dispatchFormState({
+			type: FORM_INPUT_UPDATE,
+			value: text,
+			isValid: isValid,
+			input: inputIdentifier
+		});
 	};
 
 	return (
 		<ScrollView style={styles.form}>
-			<View style={styles.formControl}>
-				<Text style={styles.label}>Title</Text>
-				<TextInput
-					style={styles.input}
-					value={title}
-					onChangeText={titleChangeHandler}
-					keyboardType="default"
-					autoCapitalize="sentences"
-					autoCorrect
-					returnKeyType="next"
-					onEndEditing={() => console.log('onEndEditing')}
-					onSubmitEditing={() => console.log('onSubmitEditing')}
-				/>
-				{!titleIsValid && <Text>Please enter a valid title</Text>}
-			</View>
+			
 			<View style={styles.formControl}>
 				<Text style={styles.label}>Image</Text>
-				<TextInput style={styles.input} value={imageUrl} onChangeText={(text) => setImageUrl(text)} />
+				<TextInput
+					style={styles.input}
+					value={formState.inputValues.imageUrl}
+					onChangeText={textChangeHandler.bind(this, 'imageUrl')}
+				/>
 			</View>
 			{/* If in edited mode then we get no price */}
 			{editedProduct ? null : (
@@ -81,9 +124,9 @@ const EditProductScreen = (props) => {
 					<Text style={styles.label}>Price</Text>
 					<TextInput
 						style={styles.input}
-						value={price}
-						onChangeText={(text) => setPrice(text)}
-						keyboardType="numeric"
+						value={formState.inputValues.price}
+						onChangeText={textChangeHandler.bind(this, 'price')}
+						keyboardType="decimal-pad"
 					/>
 				</View>
 			)}
@@ -92,9 +135,8 @@ const EditProductScreen = (props) => {
 				{/* For keyboardType check the docs form Platform compatibility */}
 				<TextInput
 					style={styles.input}
-					value={description}
-					onChangeText={(text) => setDescription(text)}
-					keyboardType="numeric"
+					value={formState.inputValues.description}
+					onChangeText={textChangeHandler.bind(this, 'description')}
 				/>
 			</View>
 		</ScrollView>
