@@ -1,10 +1,11 @@
 import React, { useEffect, useCallback, useReducer } from 'react';
-import { View, ScrollView, TextInput, Platform, Text, StyleSheet, Alert } from 'react-native';
-import { useSelector, useDispatch } from 'react-redux';
+import { View, ScrollView, KeyboardAvoidingView, StyleSheet, Platform, Alert } from 'react-native';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
+import { useSelector, useDispatch } from 'react-redux';
 
 import CustomHeaderButton from '../../components/UI/CustomHeaderButton';
-import * as productActions from '../../store/actions/products';
+import * as productsActions from '../../store/actions/products';
+import Input from '../../components/UI/Input';
 
 const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE';
 
@@ -24,8 +25,8 @@ const formReducer = (state, action) => {
 		}
 		return {
 			formIsValid: updatedFormIsValid,
-			inputValues: updatedValues,
-			inputValidities: updatedValidities
+			inputValidities: updatedValidities,
+			inputValues: updatedValues
 		};
 	}
 	return state;
@@ -33,10 +34,7 @@ const formReducer = (state, action) => {
 
 const EditProductScreen = (props) => {
 	const prodId = props.navigation.getParam('productId');
-	// If productId is not set (if we press the add button in UserProductScreen)
-	// then editedProduct will be undifined. But that is OK.
 	const editedProduct = useSelector((state) => state.products.userProducts.find((prod) => prod.id === prodId));
-
 	const dispatch = useDispatch();
 
 	const [ formState, dispatchFormState ] = useReducer(formReducer, {
@@ -54,33 +52,32 @@ const EditProductScreen = (props) => {
 		},
 		formIsValid: editedProduct ? true : false
 	});
-	// Rap it with useCallback to avoid infinite loop.
+
 	const submitHandler = useCallback(
 		() => {
 			if (!formState.formIsValid) {
-				Alert.alert('Invalid input', 'Please check the error in the form', [ { text: 'OK' } ]);
+				Alert.alert('Wrong input!', 'Please check the errors in the form.', [ { text: 'Okay' } ]);
 				return;
 			}
 			if (editedProduct) {
 				dispatch(
-					productActions.updateProduct(
+					productsActions.updateProduct(
 						prodId,
 						formState.inputValues.title,
 						formState.inputValues.description,
 						formState.inputValues.imageUrl
 					)
 				);
-			} else
-				// Put a + to price to convert it from a string to a number so the .toFixed(2)
-				// function works (in ProductsOverviewScreen) !
+			} else {
 				dispatch(
-					productActions.createProduct(
+					productsActions.createProduct(
 						formState.inputValues.title,
 						formState.inputValues.description,
 						formState.inputValues.imageUrl,
 						+formState.inputValues.price
 					)
 				);
+			}
 			props.navigation.goBack();
 		},
 		[ dispatch, prodId, formState ]
@@ -93,53 +90,76 @@ const EditProductScreen = (props) => {
 		[ submitHandler ]
 	);
 
-	const textChangeHandler = (inputIdentifier, text) => {
-		let isValid = false;
-		if (text.trim().length > 0) {
-			isValid = true;
-		}
-
-		dispatchFormState({
-			type: FORM_INPUT_UPDATE,
-			value: text,
-			isValid: isValid,
-			input: inputIdentifier
-		});
-	};
+	const inputChangeHandler = useCallback(
+		(inputIdentifier, inputValue, inputValidity) => {
+			dispatchFormState({
+				type: FORM_INPUT_UPDATE,
+				value: inputValue,
+				isValid: inputValidity,
+				input: inputIdentifier
+			});
+		},
+		[ dispatchFormState ]
+	);
 
 	return (
-		<ScrollView style={styles.form}>
-			
-			<View style={styles.formControl}>
-				<Text style={styles.label}>Image</Text>
-				<TextInput
-					style={styles.input}
-					value={formState.inputValues.imageUrl}
-					onChangeText={textChangeHandler.bind(this, 'imageUrl')}
-				/>
-			</View>
-			{/* If in edited mode then we get no price */}
-			{editedProduct ? null : (
-				<View style={styles.formControl}>
-					<Text style={styles.label}>Price</Text>
-					<TextInput
-						style={styles.input}
-						value={formState.inputValues.price}
-						onChangeText={textChangeHandler.bind(this, 'price')}
-						keyboardType="decimal-pad"
+		<KeyboardAvoidingView style={{flex: 1}} behavior='padding' keyboardVerticalOffset={100} >
+			<ScrollView>
+				<View style={styles.form}>
+					<Input
+						id="title"
+						label="Title"
+						errorText="Please enter a valid title!"
+						keyboardType="default"
+						autoCapitalize="sentences"
+						autoCorrect
+						returnKeyType="next"
+						onInputChange={inputChangeHandler}
+						initialValue={editedProduct ? editedProduct.title : ''}
+						initiallyValid={!!editedProduct}
+						required
+					/>
+					<Input
+						id="imageUrl"
+						label="Image Url"
+						errorText="Please enter a valid image url!"
+						keyboardType="default"
+						returnKeyType="next"
+						onInputChange={inputChangeHandler}
+						initialValue={editedProduct ? editedProduct.imageUrl : ''}
+						initiallyValid={!!editedProduct}
+						required
+					/>
+					{editedProduct ? null : (
+						<Input
+							id="price"
+							label="Price"
+							errorText="Please enter a valid price!"
+							keyboardType="decimal-pad"
+							returnKeyType="next"
+							onInputChange={inputChangeHandler}
+							required
+							min={0.1}
+						/>
+					)}
+					<Input
+						id="description"
+						label="Description"
+						errorText="Please enter a valid description!"
+						keyboardType="default"
+						autoCapitalize="sentences"
+						autoCorrect
+						multiline
+						numberOfLines={3}
+						onInputChange={inputChangeHandler}
+						initialValue={editedProduct ? editedProduct.description : ''}
+						initiallyValid={!!editedProduct}
+						required
+						minLength={5}
 					/>
 				</View>
-			)}
-			<View style={styles.formControl}>
-				<Text style={styles.label}>Description</Text>
-				{/* For keyboardType check the docs form Platform compatibility */}
-				<TextInput
-					style={styles.input}
-					value={formState.inputValues.description}
-					onChangeText={textChangeHandler.bind(this, 'description')}
-				/>
-			</View>
-		</ScrollView>
+			</ScrollView>
+		</KeyboardAvoidingView>
 	);
 };
 
@@ -162,20 +182,6 @@ EditProductScreen.navigationOptions = (navData) => {
 const styles = StyleSheet.create({
 	form: {
 		margin: 20
-	},
-	formControl: {
-		width: '100%'
-		// marginBottom: 10
-	},
-	label: {
-		fontFamily: 'open-sans-bold'
-		// marginHorizontal: 8
-	},
-	input: {
-		paddingHorizontal: 1,
-		paddingVertical: 5,
-		borderBottomColor: '#ccc',
-		borderBottomWidth: 1
 	}
 });
 
