@@ -3,13 +3,17 @@ This is a Udemy course
 
 # Sections:
 ### 8. Time to Practice [THE SHOP APP]
-
+### 9. Handling User Input.
+### 10. Http Requests & Adding a Web Server + Database
 
 
 # Packages installed:
 ### For Section 8:
-#### redux react-redux react-navigation react-navigation-stack react-navigation-header-buttons
-#### !!! expo install react-native-gesture-handler react-native-reanimated
-#### expo-font
-#### npm install --save-dev redux-devtools-extension 
-#### moment (for formating dates)
+### redux react-redux react-navigation react-navigation-stack react-navigation-header-buttons
+### !!! expo install react-native-gesture-handler react-native-reanimated
+### expo-font
+### npm install --save-dev redux-devtools-extension 
+### moment (for formating dates)
+
+### For Section 10:
+### redux-thunk
