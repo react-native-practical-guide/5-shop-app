@@ -11,11 +11,11 @@ export const fetchProducts = () => {
 			const response = await fetch('https://shop-app-bf402.firebaseio.com/products.json');
 
 			if (!response.ok) {
-				throw new Error('Something went wrong with fetching the data from the server!')
+				throw new Error('Something went wrong with fetching the data from the server!');
 			}
 			const resData = await response.json();
 			const loadedProducts = [];
-	
+
 			for (const key in resData) {
 				loadedProducts.push(
 					new Product(
@@ -24,7 +24,7 @@ export const fetchProducts = () => {
 						resData[key].title,
 						resData[key].imageUrl,
 						resData[key].description,
-						resData[key].price,
+						resData[key].price
 					)
 				);
 			}
@@ -32,18 +32,22 @@ export const fetchProducts = () => {
 				type: SET_PRODUCTS,
 				products: loadedProducts
 			});
-		} catch ( err) {
+		} catch (err) {
 			// sent error to custom analytics server
-			throw err
+			throw err;
 		}
-		
 	};
 };
 
 export const deleteProduct = (productId) => {
-	return {
-		type: DELETE_PRODUCT,
-		pid: productId
+	return async (dispatch) => {
+		await fetch(`https://shop-app-bf402.firebaseio.com/products/${productId}.json`, {
+			method: 'DELETE'
+		});
+		dispatch({
+			type: DELETE_PRODUCT,
+			pid: productId
+		});
 	};
 };
 
@@ -66,7 +70,7 @@ export const createProduct = (title, description, imageUrl, price) => {
 				title,
 				description,
 				imageUrl,
-				price,
+				price
 			})
 		});
 
@@ -87,13 +91,27 @@ export const createProduct = (title, description, imageUrl, price) => {
 };
 
 export const updateProduct = (id, title, description, imageUrl) => {
-	return {
-		type: UPDATE_PRODUCT,
-		pid: id,
-		productData: {
-			title,
-			description,
-			imageUrl
-		}
+	return async (dispatch) => {
+		await fetch(`https://shop-app-bf402.firebaseio.com/products/${id}.json`, {
+			method: 'PATCH',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				title,
+				description,
+				imageUrl
+			})
+		});
+
+		dispatch({
+			type: UPDATE_PRODUCT,
+			pid: id,
+			productData: {
+				title,
+				description,
+				imageUrl
+			}
+		});
 	};
 };
