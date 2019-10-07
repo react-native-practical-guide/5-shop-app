@@ -5,22 +5,22 @@ import Product from '../../models/product';
 const initialState = {
 	availableProducts: PRODUCTS,
 	userProducts: PRODUCTS.filter((prod) => prod.ownerId === 'u1'), // dummy set up
-	// favoriteProducts: []
+	favoriteProducts: []
 };
 
 export default (state = initialState, action) => {
 	switch (action.type) {
 		case SET_PRODUCTS:
 			return {
+				...state,
 				availableProducts: action.products,
 				userProducts: action.products.filter((prod) => prod.ownerId === 'u1') // dummy set up
 			};
 		case DELETE_PRODUCT:
 			return {
-				...state,
 				userProducts: state.userProducts.filter((product) => product.id !== action.pid),
 				availableProducts: state.availableProducts.filter((product) => product.id !== action.pid),
-				// favoriteProducts: state.favoriteProducts.filter((product) => product.id !== action.pid)
+				favoriteProducts: state.favoriteProducts.filter((product) => product.id !== action.pid)
 			};
 		case CREATE_PRODUCT:
 			const newProduct = new Product(
@@ -53,14 +53,14 @@ export default (state = initialState, action) => {
 			const updatedAvailableProducts = [ ...state.availableProducts ];
 			updatedAvailableProducts[availableProductIndex] = updatedProduct;
 
-			// favoriteProductIndex = state.favoriteProducts.findIndex((prod) => prod.id === action.pid);
-			// const updatedFavoriteProducts = [ ...state.favoriteProducts ];
-			// updatedFavoriteProducts[favoriteProductIndex] = updatedProduct;
+			favoriteProductIndex = state.favoriteProducts.findIndex((prod) => prod.id === action.pid);
+			const updatedFavoriteProducts = [ ...state.favoriteProducts ];
+			updatedFavoriteProducts[favoriteProductIndex] = updatedProduct;
 			return {
 				...state,
 				userProducts: updatedUserProducts,
 				availableProducts: updatedAvailableProducts,
-				// favoriteProducts: updatedFavoriteProducts
+				favoriteProducts: updatedFavoriteProducts
 			};
 	}
 	return state;
