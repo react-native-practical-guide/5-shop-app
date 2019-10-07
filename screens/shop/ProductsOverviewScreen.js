@@ -16,6 +16,8 @@ const ProductsOverviewScreen = (props) => {
 	const dispatch = useDispatch();
 
 	const loadProducts = useCallback(async () => {
+		// Note multiple set-states get bached together by React!
+		setError(null);
 		setIsLoading(true);
 		try {
 			await dispatch(productsActions.fetchProducts());
@@ -42,7 +44,7 @@ const ProductsOverviewScreen = (props) => {
 		return (
 			<View style={styles.centered}>
 				<Text>An error occurred!</Text>
-				<Button title="Try again" onPress={loadProducts} color={Colours.chocolate}  />
+				<Button title="Try again" onPress={loadProducts} color={Colours.chocolate} />
 			</View>
 		);
 	}
