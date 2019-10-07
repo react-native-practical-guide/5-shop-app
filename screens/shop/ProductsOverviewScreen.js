@@ -15,24 +15,37 @@ const ProductsOverviewScreen = (props) => {
 	const products = useSelector((state) => state.products.availableProducts);
 	const dispatch = useDispatch();
 
-	const loadProducts = useCallback(async () => {
-		// Note multiple set-states get bached together by React!
-		setError(null);
-		setIsLoading(true);
-		try {
-			await dispatch(productsActions.fetchProducts());
-		} catch (err) {
-			setError(err.message);
-		}
-		setIsLoading(false);
-	}, [dispatch]);
+	const loadProducts = useCallback(
+		async () => {
+			// Note multiple set-states get bached together by React!
+			setError(null);
+			setIsLoading(true);
+			try {
+				await dispatch(productsActions.fetchProducts());
+			} catch (err) {
+				setError(err.message);
+			}
+			setIsLoading(false);
+		},
+		[ dispatch ]
+	);
 
+	useEffect(
+		() => {
+			const willFocusEvent = props.navigation.addListener('willFocus', loadProducts);
+			return () => willFocusEvent.remove();
+		},
+		[ loadProducts ]
+	);
+
+	// This is also needed to fire loadProducts initially!
 	useEffect(
 		() => {
 			loadProducts();
 		},
 		[ dispatch, loadProducts ]
 	);
+
 	const selectItemHandler = (id, title) => {
 		props.navigation.navigate('ProductDetail', {
 			productId: id,
@@ -64,6 +77,7 @@ const ProductsOverviewScreen = (props) => {
 			</View>
 		);
 	}
+
 	return (
 		<FlatList
 			data={products}
