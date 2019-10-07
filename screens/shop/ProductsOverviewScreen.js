@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { FlatList, Button, Platform } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { FlatList, Text, View, Button, Platform, StyleSheet, ActivityIndicator } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 
@@ -10,14 +10,26 @@ import CustomHeaderButton from '../../components/UI/CustomHeaderButton';
 import Colours from '../../constants/Colours';
 
 const ProductsOverviewScreen = (props) => {
+	const [ isLoading, setIsLoading ] = useState(false);
+	const [ error, setError ] = useState(false);
 	const products = useSelector((state) => state.products.availableProducts);
 	const dispatch = useDispatch();
 
+	const loadProducts = useCallback(async () => {
+		setIsLoading(true);
+		try {
+			await dispatch(productsActions.fetchProducts());
+		} catch (err) {
+			setError(err.message);
+		}
+		setIsLoading(false);
+	}, [dispatch]);
+
 	useEffect(
 		() => {
-			dispatch(productsActions.fetchProducts());
+			loadProducts();
 		},
-		[ dispatch ]
+		[ dispatch, loadProducts ]
 	);
 	const selectItemHandler = (id, title) => {
 		props.navigation.navigate('ProductDetail', {
@@ -26,6 +38,30 @@ const ProductsOverviewScreen = (props) => {
 		});
 	};
 
+	if (error) {
+		return (
+			<View style={styles.centered}>
+				<Text>An error occurred!</Text>
+				<Button title="Try again" onPress={loadProducts} color={Colours.chocolate}  />
+			</View>
+		);
+	}
+
+	if (isLoading) {
+		return (
+			<View style={styles.centered}>
+				<ActivityIndicator size="large" color={Colours.chocolate} />
+			</View>
+		);
+	}
+
+	if (!isLoading && products.length === 0) {
+		return (
+			<View style={styles.centered}>
+				<Text>No products found!</Text>
+			</View>
+		);
+	}
 	return (
 		<FlatList
 			data={products}
@@ -76,5 +112,13 @@ ProductsOverviewScreen.navigationOptions = (navData) => {
 		)
 	};
 };
+
+const styles = StyleSheet.create({
+	centered: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center'
+	}
+});
 
 export default ProductsOverviewScreen;
