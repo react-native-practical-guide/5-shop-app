@@ -63,6 +63,7 @@ const EditProductScreen = (props) => {
 				Alert.alert('Wrong input!', 'Please check the errors in the form.', [ { text: 'Okay' } ]);
 				return;
 			}
+			setError(null);
 			setIsLoading(true);
 			try {
 				if (editedProduct) {
@@ -217,6 +218,11 @@ EditProductScreen.navigationOptions = (navData) => {
 const styles = StyleSheet.create({
 	form: {
 		margin: 20
+	},
+	centered: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center'
 	}
 });
 

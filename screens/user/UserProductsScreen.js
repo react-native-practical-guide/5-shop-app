@@ -1,5 +1,5 @@
-import React from 'react';
-import { FlatList, Button, Platform, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, ActivityIndicator, StyleSheet, FlatList, Button, Platform, Alert } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 
@@ -9,8 +9,20 @@ import Colours from '../../constants/Colours';
 import * as productsActions from '../../store/actions/products';
 
 const UserProductsScreen = (props) => {
+	const [ isLoading, setIsLoading ] = useState(false);
+	const [ error, setError ] = useState(false);
+
 	const dispatch = useDispatch();
 	const userProducts = useSelector((state) => state.products.userProducts);
+
+	useEffect(
+		() => {
+			if (error) {
+				Alert.alert('Error occurred!', error, [ { text: 'OK' } ]);
+			}
+		},
+		[ error ]
+	);
 
 	const editProductHandler = (id) => {
 		props.navigation.navigate('EditProduct', { productId: id });
@@ -19,9 +31,31 @@ const UserProductsScreen = (props) => {
 	const deleteHandler = (id) => {
 		Alert.alert('Delete product!', 'Are you sure you want to delete this product?', [
 			{ text: 'NO', style: 'default' },
-			{ text: 'YES', style: 'destructive', onPress: () => dispatch(productsActions.deleteProduct(id)) }
+			{
+				text: 'YES',
+				style: 'destructive',
+				onPress: async () => {
+					setError(null);
+					setIsLoading(true);
+					try {
+						await dispatch(productsActions.deleteProduct(id));
+					} catch (err) {
+						setError(err.message);
+					}
+					setIsLoading(false);
+				}
+			}
 		]);
 	};
+
+	if (isLoading) {
+		return (
+			<View style={styles.centered}>
+				<ActivityIndicator size="large" color={Colours.chocolate} />
+			</View>
+		);
+	}
+
 	return (
 		<FlatList
 			data={userProducts}
@@ -68,5 +102,13 @@ UserProductsScreen.navigationOptions = (navData) => {
 		)
 	};
 };
+
+const styles = StyleSheet.create({
+	centered: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center'
+	}
+});
 
 export default UserProductsScreen;

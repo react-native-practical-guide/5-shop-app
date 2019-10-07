@@ -46,7 +46,7 @@ export const deleteProduct = (productId) => {
 		});
 
 		if (!response.ok) {
-			throw new Error('Something went wrong with deleting the data from the server!');
+			throw new Error('Something went wrong with deleting the data on the server!');
 		}
 
 		dispatch({
