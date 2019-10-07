@@ -1,6 +1,34 @@
+import Product from '../../models/product';
+
 export const DELETE_PRODUCT = 'DELETE_PRODUCT';
 export const CREATE_PRODUCT = 'CREATE_PRODUCT';
 export const UPDATE_PRODUCT = 'UPDATE_PRODUCT';
+export const SET_PRODUCTS = 'SET_PRODUCTS';
+
+export const fetchProducts = () => {
+	return async (dispatch) => {
+		const response = await fetch('https://shop-app-bf402.firebaseio.com/products.json');
+		const resData = await response.json();
+		const loadedProducts = [];
+
+		for (const key in resData) {
+			loadedProducts.push(
+				new Product(
+					key,
+					'u1',
+					resData[key].title,
+					resData[key].imageUrl,
+					resData[key].description,
+					resData[key].price,
+				)
+			);
+		}
+		dispatch({
+			type: SET_PRODUCTS,
+			products: loadedProducts
+		});
+	};
+};
 
 export const deleteProduct = (productId) => {
 	return {
@@ -24,22 +52,21 @@ export const createProduct = (title, description, imageUrl, price) => {
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({
-				// Set in alphabetical order, because this is what Firebase uses...
+				// Note: Firebase uses alphabetical order...
+				title,
 				description,
 				imageUrl,
 				price,
-				title,
 			})
 		});
 
 		const resData = await response.json();
-		console.log(resData);
 
 		// Redux thunk will call this `dispatch` func.
 		dispatch({
 			type: CREATE_PRODUCT,
 			productData: {
-				id: resData.name, // `name` is the key that Firebase gives to its ids... 
+				id: resData.name, // `name` is the key that Firebase gives to its ids...
 				title,
 				description,
 				imageUrl,
