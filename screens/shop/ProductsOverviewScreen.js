@@ -17,7 +17,7 @@ const ProductsOverviewScreen = (props) => {
 
 	const loadProducts = useCallback(
 		async () => {
-			// Note multiple set-states get bached together by React!
+			// Note multiple set-states get batched together by React!
 			setError(null);
 			setIsLoading(true);
 			try {

@@ -1,4 +1,40 @@
 export const ADD_ORDER = 'ADD_ORDER';
+export const SET_ORDERS = 'SET_ORDERS';
+
+import Order from '../../models/order';
+
+export const fetchOrders = () => {
+	return async (dispatch) => {
+		try {
+			const response = await fetch('https://shop-app-bf402.firebaseio.com/orders/u1.json');
+
+			if (!response.ok) {
+				throw new Error('Something went wrong with fetching the data from the server!');
+			}
+			const resData = await response.json();
+			const loadedOrders = [];
+
+			for (const key in resData) {
+				loadedOrders.push(
+					new Order(
+						key,
+						resData[key].cartItems,
+						resData[key].totalAmount,
+						// Just resData[key].date works too, but we need to get an object (!?)
+						new Date(resData[key].date),
+					)
+				);
+			}
+			dispatch({
+				type: SET_ORDERS,
+				orders: loadedOrders
+			});
+		} catch (err) {
+			// sent error to custom analytics server
+			throw err;
+		}
+	};
+};
 
 export const addOrder = (cartItems, totalAmount) => {
 	return async (dispatch) => {
