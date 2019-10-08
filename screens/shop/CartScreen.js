@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Button, StyleSheet, ActivityIndicator } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { FlatList } from 'react-native-gesture-handler';
 
@@ -10,6 +10,8 @@ import Card from '../../components/UI/Card';
 import Colours from '../../constants/Colours';
 
 const CartScreen = (props) => {
+	const [ isLoading, setIsLoading ] = useState(false);
+	// const [ error, setError ] = useState(false);
 	const dispatch = useDispatch();
 	const cartTotalAmount = useSelector((state) => state.cart.totalAmount);
 	const cartItems = useSelector((state) => {
@@ -28,6 +30,16 @@ const CartScreen = (props) => {
 		return transformedCartItems.sort((a, b) => (a.productId > b.productId ? 1 : -1));
 	});
 
+	const sendOrderHandler = async () => {
+		setIsLoading(true);
+		await dispatch(ordersActions.addOrder(cartItems, cartTotalAmount));
+		setIsLoading(false);
+	};
+
+	if (isLoading) {
+		return <View style={styles.centered} />;
+	}
+
 	return (
 		<View style={styles.screen}>
 			<Card style={styles.summary}>
@@ -36,12 +48,16 @@ const CartScreen = (props) => {
 					Total: <Text style={styles.amount}>${Math.round(cartTotalAmount.toFixed(2) * 100) / 100}</Text>
 				</Text>
 				{/* NOTE: cartItems is an array!!! */}
-				<Button
-					color={Colours.chocolate}
-					title="Order Now"
-					disabled={cartItems.length === 0}
-					onPress={() => dispatch(ordersActions.addOrder(cartItems, cartTotalAmount))}
-				/>
+				{isLoading ? (
+					<ActivityIndicator size="large" color={Colours.chocolate} />
+				) : (
+					<Button
+						color={Colours.chocolate}
+						title="Order Now"
+						disabled={cartItems.length === 0}
+						onPress={sendOrderHandler}
+					/>
+				)}
 			</Card>
 			<FlatList
 				data={cartItems}
@@ -73,7 +89,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		marginBottom: 20,
-		padding: 10,
+		padding: 10
 	},
 	summaryText: {
 		fontFamily: 'open-sans-bold',
@@ -82,6 +98,11 @@ const styles = StyleSheet.create({
 	},
 	amount: {
 		color: Colours.chocolate
+	},
+	centered: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center'
 	}
 });
 
