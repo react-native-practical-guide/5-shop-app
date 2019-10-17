@@ -9,6 +9,8 @@ check the status of the updated product on the server
 ### 8. Time to Practice [THE SHOP APP]
 ### 9. Handling User Input.
 ### 10. Http Requests & Adding a Web Server + Database
+### 11. User Authentication
+In order to find where to send the request for authentication, google 'firebase rest auth api'
 
 
 # Packages installed:
