@@ -1,6 +1,6 @@
-import React from 'react'
+import React from 'react';
 import { Platform } from 'react-native';
-import { createAppContainer } from 'react-navigation';
+import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createDrawerNavigator } from 'react-navigation-drawer';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,6 +12,7 @@ import CartScreen from '../screens/shop/CartScreen';
 import OrdersScreen from '../screens/shop/OrdersScreen';
 import UserProductsScreen from '../screens/user/UserProductsScreen';
 import EditProductScreen from '../screens/user/EditProductScreen';
+import AuthScreen from '../screens/user/AuthScreen';
 
 const defaultNavOptions = {
 	headerStyle: {
@@ -37,9 +38,11 @@ const ProductsNavigator = createStackNavigator(
 	{
 		navigationOptions: {
 			drawerIcon: (drawerConfig) => (
-				<Ionicons name={Platform.OS === 'android' ? 'md-cart' : 'ios-cart'}
-				size={23} 
-				color={drawerConfig.tintColor} />
+				<Ionicons
+					name={Platform.OS === 'android' ? 'md-cart' : 'ios-cart'}
+					size={23}
+					color={drawerConfig.tintColor}
+				/>
 			)
 		},
 		defaultNavigationOptions: defaultNavOptions
@@ -54,9 +57,11 @@ const OrdersNavigator = createStackNavigator(
 		// navigationOptions only apply if this Screen here, belongs to another Navigator
 		navigationOptions: {
 			drawerIcon: (drawerConfig) => (
-				<Ionicons name={Platform.OS === 'android' ? 'md-list' : 'ios-list'}
-				size={23} 
-				color={drawerConfig.tintColor} />
+				<Ionicons
+					name={Platform.OS === 'android' ? 'md-list' : 'ios-list'}
+					size={23}
+					color={drawerConfig.tintColor}
+				/>
 			)
 		},
 		defaultNavigationOptions: defaultNavOptions
@@ -72,9 +77,11 @@ const AdminNavigator = createStackNavigator(
 		// navigationOptions only apply if this Screen here, belongs to another Navigator
 		navigationOptions: {
 			drawerIcon: (drawerConfig) => (
-				<Ionicons name={Platform.OS === 'android' ? 'md-create' : 'ios-create'}
-				size={23} 
-				color={drawerConfig.tintColor} />
+				<Ionicons
+					name={Platform.OS === 'android' ? 'md-create' : 'ios-create'}
+					size={23}
+					color={drawerConfig.tintColor}
+				/>
 			)
 		},
 		defaultNavigationOptions: defaultNavOptions
@@ -94,4 +101,18 @@ const ShopNavigator = createDrawerNavigator(
 	}
 );
 
-export default createAppContainer(ShopNavigator);
+const AuthNavigator = createStackNavigator(
+	{
+		Auth: AuthScreen
+	},
+	{
+		defaultNavigationOptions: defaultNavOptions
+	}
+);
+
+const MainNavigator = createSwitchNavigator({
+	Auth: AuthNavigator,
+	Shop: ShopNavigator
+});
+
+export default createAppContainer(MainNavigator);

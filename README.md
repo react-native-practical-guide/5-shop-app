@@ -1,6 +1,10 @@
 This is a Udemy course
 [React Native - The Practical Guide](https://www.udemy.com/react-native-the-practical-guide/)
 
+### TODO
+check the status of the updated product on the server
+
+
 # Sections:
 ### 8. Time to Practice [THE SHOP APP]
 ### 9. Handling User Input.
@@ -17,3 +21,6 @@ This is a Udemy course
 
 ### For Section 10:
 ### redux-thunk
+
+### For Section 11:
+### expo-linear-gradient
