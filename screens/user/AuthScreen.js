@@ -1,4 +1,4 @@
-import React, { useReducer, useCallback } from 'react';
+import React, { useReducer, useState, useCallback } from 'react';
 import { View, KeyboardAvoidingView, ScrollView, Text, Image, Button, StyleSheet } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -10,8 +10,9 @@ import * as authActions from '../../store/actions/auth';
 
 const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE';
 
-
 const formReducer = (state, action) => {
+	// console.log('state, action', state, action);
+	
 	if (action.type === FORM_INPUT_UPDATE) {
 		const updatedValues = {
 			...state.inputValues,
@@ -35,26 +36,41 @@ const formReducer = (state, action) => {
 };
 
 const AuthScreen = (props) => {
-    const dispatch = useDispatch();
+	const [ error, setError ] = useState(false);
 
-    const [ formState, dispatchFormState ] = useReducer(formReducer, {
+	const dispatch = useDispatch();
+
+	const [ formState, dispatchFormState ] = useReducer(formReducer, {
 		inputValues: {
 			email: '',
-			password: '',
+			password: ''
 		},
 		inputValidities: {
 			email: false,
-			password: false,
+			password: false
 		},
 		formIsValid: false
 	});
 
-    const signupHandler = () => {
-        dispatch(authActions.signup(formState.inputValues.email, formState.inputValues.password))
-    }
+	const signupHandler = useCallback(
+		async () => {
+			console.log('formState.inputValues.email ', formState.inputValues.email );
+			console.log('formState.inputValues.password', formState.inputValues.password);
+			setError(null);
+			
+			try {
+				await dispatch(authActions.signup(formState.inputValues.email, formState.inputValues.password));
+			} catch (err) {
+				setError(err.messsage);
+			}
+		},
+		[ dispatch, formState, dispatchFormState ]
+	);
 
-    const inputChangeHandler = useCallback(
+	const inputChangeHandler = useCallback(
 		(inputIdentifier, inputValue, inputValidity) => {
+			// console.log('inputIdentifier, inputValue, inputValidity', inputIdentifier, inputValue, inputValidity);
+			
 			dispatchFormState({
 				type: FORM_INPUT_UPDATE,
 				value: inputValue,
@@ -63,9 +79,18 @@ const AuthScreen = (props) => {
 			});
 		},
 		[ dispatchFormState ]
-    );
-    
-	return ( 
+	);
+
+	if (error) {
+		return (
+			<View style={styles.centered}>
+				<Text>An error occurred!</Text>
+				<Button title="Try again" onPress={loadProducts} color={Colours.chocolate} />
+			</View>
+		);
+	}
+
+	return (
 		<KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={50} style={styles.screen}>
 			<LinearGradient
 				colors={[ Colours.chocolate, Colours.maroon ]}
@@ -77,28 +102,26 @@ const AuthScreen = (props) => {
 					<ScrollView>
 						<Input
 							id="email"
-							label="E-mail"
-							errorText="Please enter a valid email address!"
+							label="E-Mail"
 							keyboardType="email-address"
-							autoCapitalize="none"
-							// returnKeyType="next"
-							onInputChange={inputChangeHandler}
-							initialValue=""
 							required
 							email
+							autoCapitalize="none"
+							errorText="Please enter a valid email address."
+							onInputChange={inputChangeHandler}
+							initialValue=""
 						/>
 						<Input
 							id="password"
 							label="Password"
-							errorText="Please enter a valid password!"
 							keyboardType="default"
 							secureTextEntry
+							required
 							minLength={5}
 							autoCapitalize="none"
-							// returnKeyType="next"
+							errorText="Please enter a valid password."
 							onInputChange={inputChangeHandler}
 							initialValue=""
-							required
 						/>
 					</ScrollView>
 					<View style={styles.buttonContainer}>
@@ -107,7 +130,7 @@ const AuthScreen = (props) => {
 					<View style={styles.buttonContainer}>
 						<Button title="Switch to Sign Up" color={Colours.maroon} onPress={() => {}} />
 					</View>
-				</Card>  
+				</Card>
 			</LinearGradient>
 		</KeyboardAvoidingView>
 	);
@@ -135,10 +158,10 @@ const styles = StyleSheet.create({
 		maxWidth: 400,
 		maxHeight: 400,
 		padding: 20
-    },
-    buttonContainer: {
-        marginTop: 10
-    }
+	},
+	buttonContainer: {
+		marginTop: 10
+	}
 });
 
 export default AuthScreen;
