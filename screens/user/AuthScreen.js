@@ -1,5 +1,15 @@
-import React, { useReducer, useState, useCallback } from 'react';
-import { View, KeyboardAvoidingView, ScrollView, Text, Image, Button, StyleSheet } from 'react-native';
+import React, { useReducer, useEffect, useState, useCallback } from 'react';
+import {
+	View,
+	KeyboardAvoidingView,
+	ScrollView,
+	Text,
+	ActivityIndicator,
+	Image,
+	Button,
+	StyleSheet,
+	Alert
+} from 'react-native';
 import { useDispatch } from 'react-redux';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -12,7 +22,7 @@ const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE';
 
 const formReducer = (state, action) => {
 	// console.log('state, action', state, action);
-	
+
 	if (action.type === FORM_INPUT_UPDATE) {
 		const updatedValues = {
 			...state.inputValues,
@@ -36,7 +46,9 @@ const formReducer = (state, action) => {
 };
 
 const AuthScreen = (props) => {
-	const [ error, setError ] = useState(false);
+	const [ error, setError ] = useState();
+	const [ isLoading, setIsLoading ] = useState(false);
+	const [ isSignUp, setIsSignUp ] = useState(false);
 
 	const dispatch = useDispatch();
 
@@ -52,25 +64,37 @@ const AuthScreen = (props) => {
 		formIsValid: false
 	});
 
-	const signupHandler = useCallback(
-		async () => {
-			console.log('formState.inputValues.email ', formState.inputValues.email );
-			console.log('formState.inputValues.password', formState.inputValues.password);
-			setError(null);
-			
-			try {
-				await dispatch(authActions.signup(formState.inputValues.email, formState.inputValues.password));
-			} catch (err) {
-				setError(err.messsage);
+	useEffect(
+		() => {
+			if (error) {
+				Alert.alert('An Error Occurred!', error, [ { text: 'Okay' } ]);
 			}
+		},
+		[ error ]
+	);
+
+	const authHandler = useCallback(
+		async () => {
+			let action;
+			if (isSignUp) {
+				action = authActions.signup(formState.inputValues.email, formState.inputValues.password);
+			} else {
+				action = authActions.login(formState.inputValues.email, formState.inputValues.password);
+			}
+			setError(null);
+			setIsLoading(true);
+			try {
+				await dispatch(action);
+			} catch (err) {
+				setError(err.message);
+			}
+			setIsLoading(false);
 		},
 		[ dispatch, formState, dispatchFormState ]
 	);
 
 	const inputChangeHandler = useCallback(
 		(inputIdentifier, inputValue, inputValidity) => {
-			// console.log('inputIdentifier, inputValue, inputValidity', inputIdentifier, inputValue, inputValidity);
-			
 			dispatchFormState({
 				type: FORM_INPUT_UPDATE,
 				value: inputValue,
@@ -81,19 +105,19 @@ const AuthScreen = (props) => {
 		[ dispatchFormState ]
 	);
 
-	if (error) {
-		return (
-			<View style={styles.centered}>
-				<Text>An error occurred!</Text>
-				<Button title="Try again" onPress={loadProducts} color={Colours.chocolate} />
-			</View>
-		);
-	}
+	// if (error) {
+	// 	return (
+	// 		<View style={styles.centered}>
+	// 			<Text>An error occurred!</Text>
+	// 			<Button title="Try again" onPress={loadProducts} color={Colours.chocolate} />
+	// 		</View>
+	// 	);
+	// }
 
 	return (
 		<KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={50} style={styles.screen}>
 			<LinearGradient
-				colors={[ Colours.chocolate, Colours.maroon ]}
+				colors={[ 'white', Colours.chocolate, Colours.maroon ]}
 				// start={{ x: 0, y: 1 }}
 				// end={{ x: 0, y: 0 }}
 				style={styles.gradient}
@@ -125,10 +149,22 @@ const AuthScreen = (props) => {
 						/>
 					</ScrollView>
 					<View style={styles.buttonContainer}>
-						<Button title="Login" color={Colours.chocolate} onPress={signupHandler} />
+						{isLoading ? (
+							<ActivityIndicator size="large" color={Colours.chocolate} />
+						) : (
+							<Button
+								title={isSignUp ? 'Sign Up' : 'Login'}
+								color={Colours.chocolate}
+								onPress={authHandler}
+							/>
+						)}
 					</View>
 					<View style={styles.buttonContainer}>
-						<Button title="Switch to Sign Up" color={Colours.maroon} onPress={() => {}} />
+						<Button
+							title={`Switch to ${isSignUp ? 'Log in' : 'Sign Up'}`}
+							color={Colours.maroon}
+							onPress={() => setIsSignUp(!isSignUp)}
+						/>
 					</View>
 				</Card>
 			</LinearGradient>
