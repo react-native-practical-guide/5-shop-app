@@ -96,8 +96,10 @@ export const createProduct = (title, description, imageUrl, price) => {
 };
 
 export const updateProduct = (id, title, description, imageUrl) => {
-	return async (dispatch) => {
-		const response = await fetch(`https://shop-app-bf402.firebaseio.com/products/${id}.json`, {
+	return async (dispatch, getState) => {
+		const token = getState().auth.token;
+		// For token authentication check https://firebase.google.com/docs/database/rest/auth
+		const response = await fetch(`https://shop-app-bf402.firebaseio.com/products/${id}.json?auth=${token}`, {
 			method: 'PATCH',
 			headers: {
 				'Content-Type': 'application/json'
@@ -110,6 +112,7 @@ export const updateProduct = (id, title, description, imageUrl) => {
 		});
 
 		if (!response.ok) {
+			const resData = await response.json();
 			throw new Error('Something went wrong with updating the data on the server!');
 		}
 

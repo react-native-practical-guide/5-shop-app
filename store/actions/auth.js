@@ -20,8 +20,6 @@ export const signup = (email, password) => {
 
 		if (!response.ok) {
 			const errorResData = await response.json();
-			console.log(errorResData);
-			
 			const errorId = errorResData.error.message;
 			let message = 'Something went wrong with logging in!';
 			if (errorId === 'EMAIL_EXISTS') {
@@ -31,15 +29,11 @@ export const signup = (email, password) => {
 		}
 
 		const resData = await response.json(); // transforms the data from json to javascript object
-		console.log(resData);
-
-		dispatch({ type: SIGN_UP });
+		dispatch({ type: SIGN_UP, token: resData.idToken, userId: resData.localId });
 	};
 };
 
 export const login = (email, password) => {
-	console.log(email, password);
-
 	return async (dispatch) => {
 		try {
 			const response = await fetch(
@@ -60,8 +54,6 @@ export const login = (email, password) => {
 	 
 			if (!response.ok) {
 				const errorResData = await response.json();
-				console.log(errorResData);
-				
 				const errorId = errorResData.error.message;
 				let message = 'Something went wrong with logging in!';
 				if (errorId === 'EMAIL_NOT_FOUND') {
@@ -71,9 +63,9 @@ export const login = (email, password) => {
 				}
 				throw new Error(message);
 			}
+
 			const resData = await response.json(); // transforms the data from json to javascript object
-			console.log(resData);
-			dispatch({ type: SIGN_UP });
+			dispatch({ type: LOG_IN, token: resData.idToken, userId: resData.localId });
 		} catch (error) {
 			throw error
 		}

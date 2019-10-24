@@ -85,10 +85,11 @@ const AuthScreen = (props) => {
 			setIsLoading(true);
 			try {
 				await dispatch(action);
+				props.navigation.navigate('Shop')
 			} catch (err) {
 				setError(err.message);
+				setIsLoading(false);
 			}
-			setIsLoading(false);
 		},
 		[ dispatch, formState, dispatchFormState ]
 	);
@@ -104,15 +105,6 @@ const AuthScreen = (props) => {
 		},
 		[ dispatchFormState ]
 	);
-
-	// if (error) {
-	// 	return (
-	// 		<View style={styles.centered}>
-	// 			<Text>An error occurred!</Text>
-	// 			<Button title="Try again" onPress={loadProducts} color={Colours.chocolate} />
-	// 		</View>
-	// 	);
-	// }
 
 	return (
 		<KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={50} style={styles.screen}>
