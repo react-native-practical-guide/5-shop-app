@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, ActivityIndicator, StyleSheet, FlatList, Button, Platform, Alert } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet, FlatList, Button, Platform, Alert } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 
@@ -52,6 +52,13 @@ const UserProductsScreen = (props) => {
 		return (
 			<View style={styles.centered}>
 				<ActivityIndicator size="large" color={Colours.chocolate} />
+			</View>
+		);
+	}
+	if (!isLoading && userProducts.length === 0) {
+		return (
+			<View style={styles.centered}>
+				<Text>No products found!</Text>
 			</View>
 		);
 	}

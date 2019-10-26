@@ -35,13 +35,13 @@ const OrdersScreen = (props) => {
 		);
 	}
 
-	// if (!isLoading && orders.length === 0) {
-	// 	return (
-	// 		<View style={styles.centered}>
-	// 			<Text>No orders found!</Text>
-	// 		</View>
-	// 	);
-	// }
+	if (!isLoading && orders.length === 0) {
+		return (
+			<View style={styles.centered}>
+				<Text>No orders found!</Text>
+			</View>
+		);
+	}
 
 	return (
 		<FlatList
