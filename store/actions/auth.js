@@ -1,5 +1,16 @@
-export const SIGN_UP = 'SIGN_UP';
-export const LOG_IN = 'LOG_IN';
+import { AsyncStorage } from 'react-native';
+
+// export const SIGN_UP = 'SIGN_UP';
+// export const LOG_IN = 'LOG_IN';
+export const AUTHENTICATE = 'AUTHENTICATE';
+
+export const authenticate = (token, userId) => {
+	return {
+		type: AUTHENTICATE,
+		token: token,
+		userId: userId
+	};
+};
 
 export const signup = (email, password) => {
 	return async (dispatch) => {
@@ -24,12 +35,15 @@ export const signup = (email, password) => {
 			let message = 'Something went wrong with logging in!';
 			if (errorId === 'EMAIL_EXISTS') {
 				message = 'This email already exists!';
-			} 
+			}
 			throw new Error(message);
 		}
 
 		const resData = await response.json(); // transforms the data from json to javascript object
-		dispatch({ type: SIGN_UP, token: resData.idToken, userId: resData.localId });
+		dispatch(authenticate(resData.idToken, resData.localId));
+		// The first new Date converts the second's huge number of miliseconds in a concrete date.
+		const expirationDate = new Date(new Date().getTime() + parseInt(resData.expiresIn) * 1000);
+		saveDataToStorage(resData.idToken, resData.localId, expirationDate);
 	};
 };
 
@@ -50,8 +64,7 @@ export const login = (email, password) => {
 					})
 				}
 			);
-	
-	 
+
 			if (!response.ok) {
 				const errorResData = await response.json();
 				const errorId = errorResData.error.message;
@@ -65,10 +78,24 @@ export const login = (email, password) => {
 			}
 
 			const resData = await response.json(); // transforms the data from json to javascript object
-			dispatch({ type: LOG_IN, token: resData.idToken, userId: resData.localId });
+			dispatch(authenticate(resData.idToken, resData.localId));
+			// The first new Date converts the second's huge number of miliseconds in a concrete date.
+			const expirationDate = new Date(new Date().getTime() + parseInt(resData.expiresIn) * 1000);
+			saveDataToStorage(resData.idToken, resData.localId, expirationDate);
 		} catch (error) {
-			throw error
+			throw error;
 		}
-		
 	};
+};
+
+const saveDataToStorage = (token, userId, expirationDate) => {
+	// data must be in string format!
+	AsyncStorage.setItem(
+		'userData',
+		JSON.stringify({
+			token: token,
+			userId: userId,
+			expiryDate: expirationDate.toISOString() // convert it to a string in a standardize format
+		})
+	);
 };
