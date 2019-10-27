@@ -5,11 +5,16 @@ import { AsyncStorage } from 'react-native';
 export const AUTHENTICATE = 'AUTHENTICATE';
 export const LOG_OUT = 'LOG_OUT';
 
-export const authenticate = (token, userId) => {
-	return {
-		type: AUTHENTICATE,
-		token: token,
-		userId: userId
+let timer;
+
+export const authenticate = (token, userId, expiryTime) => {
+	return (dispatch) => {
+		dispatch(setLogoutTimer(expiryTime));
+		dispatch({
+			type: AUTHENTICATE,
+			token: token,
+			userId: userId
+		});
 	};
 };
 
@@ -41,7 +46,7 @@ export const signup = (email, password) => {
 		}
 
 		const resData = await response.json(); // transforms the data from json to javascript object
-		dispatch(authenticate(resData.idToken, resData.localId));
+		dispatch(authenticate(resData.idToken, resData.localId, parseInt(resData.expiresIn) * 1000));
 		// The first new Date converts the second's huge number of miliseconds in a concrete date.
 		const expirationDate = new Date(new Date().getTime() + parseInt(resData.expiresIn) * 1000);
 		saveDataToStorage(resData.idToken, resData.localId, expirationDate);
@@ -79,7 +84,7 @@ export const login = (email, password) => {
 			}
 
 			const resData = await response.json(); // transforms the data from json to javascript object
-			dispatch(authenticate(resData.idToken, resData.localId));
+			dispatch(authenticate(resData.idToken, resData.localId, parseInt(resData.expiresIn) * 1000));
 			// The first new Date converts the second's huge number of miliseconds in a concrete date.
 			const expirationDate = new Date(new Date().getTime() + parseInt(resData.expiresIn) * 1000);
 			saveDataToStorage(resData.idToken, resData.localId, expirationDate);
@@ -90,7 +95,23 @@ export const login = (email, password) => {
 };
 
 export const logout = () => {
+	clearLogoutTimer();
+	AsyncStorage.removeItem('userData');
 	return { type: LOG_OUT };
+};
+
+const clearLogoutTimer = () => {
+	if (timer) {
+		clearTimeout(timer);
+	}
+};
+
+const setLogoutTimer = (expirationTime) => {
+	return (dispatch) => {
+		timer = setTimeout(() => {
+			dispatch(logout());
+		}, expirationTime);
+	};
 };
 
 const saveDataToStorage = (token, userId, expirationDate) => {
