@@ -1,19 +1,23 @@
 import React from 'react';
-import { Platform } from 'react-native';
+import { Platform, SafeAreaView, View, Button } from 'react-native';
+import { useDispatch } from 'react-redux';
+
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
-import { createDrawerNavigator } from 'react-navigation-drawer';
+import { createDrawerNavigator, DrawerNavigatorItems } from 'react-navigation-drawer';
 import { Ionicons } from '@expo/vector-icons';
 
 import ProductsOverviewScreen from '../screens/shop/ProductsOverviewScreen';
 import ProductDetailScreen from '../screens/shop/ProductDetailScreen';
-import Colours from '../constants/Colours';
 import CartScreen from '../screens/shop/CartScreen';
 import OrdersScreen from '../screens/shop/OrdersScreen';
 import UserProductsScreen from '../screens/user/UserProductsScreen';
 import EditProductScreen from '../screens/user/EditProductScreen';
 import AuthScreen from '../screens/user/AuthScreen';
 import StartUpScreen from '../screens/StartUpScreen';
+
+import * as authActions from '../store/actions/auth';
+import Colours from '../constants/Colours';
 
 const defaultNavOptions = {
 	headerStyle: {
@@ -98,6 +102,28 @@ const ShopNavigator = createDrawerNavigator(
 	{
 		contentOptions: {
 			activeTintColor: Colours.chocolate
+		},
+		// This allows you to set your own content instead of the default.
+		// This component could have been created in a separate file
+		contentComponent: (props) => {
+			const dispatch = useDispatch();
+			return (
+				<View style={{ flex: 1, paddingTop: 20 }}>
+					<SafeAreaView forceInset={{ top: 'always', horizontal: 'never' }}>
+						{/* These are the default drawer items */}
+						<DrawerNavigatorItems {...props} />
+						{/* Plus our custom button */}
+						<Button
+							title="Logout"
+							color={Colours.chocolate}
+							onPress={() => {
+								dispatch(authActions.logout());
+								props.navigation.navigate('Auth');
+							}}
+						/>
+					</SafeAreaView>
+				</View>
+			);
 		}
 	}
 );
