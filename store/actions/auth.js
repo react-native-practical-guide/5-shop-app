@@ -82,8 +82,8 @@ export const login = (email, password) => {
 				}
 				throw new Error(message);
 			}
-
 			const resData = await response.json(); // transforms the data from json to javascript object
+			
 			dispatch(authenticate(resData.idToken, resData.localId, parseInt(resData.expiresIn) * 1000));
 			// The first new Date converts the second's huge number of miliseconds in a concrete date.
 			const expirationDate = new Date(new Date().getTime() + parseInt(resData.expiresIn) * 1000);
@@ -106,11 +106,13 @@ const clearLogoutTimer = () => {
 	}
 };
 
+// This is for automatic logging out the user...
+// Gets dispatched in `authenticate` action
 const setLogoutTimer = (expirationTime) => {
 	return (dispatch) => {
 		timer = setTimeout(() => {
 			dispatch(logout());
-		}, expirationTime);
+		}, expirationTime / 1000);
 	};
 };
 

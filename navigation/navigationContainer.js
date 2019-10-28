@@ -1,4 +1,5 @@
 // We use this rupper navigator in order to use Redux...
+// And because in startUpScreen we can not navigate to the authScreen.
 import React, { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { NavigationActions } from 'react-navigation';

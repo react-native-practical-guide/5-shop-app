@@ -4,8 +4,11 @@ This is a Udemy course
 ### TODO
 check the status of the updated product on the server
 
+### TODO
+### Make sure the user does not logout automatically after one hour, if he is using the app. The one hour time should be refreshed if he is active...
 
-# Sections:
+
+## Sections:
 ### 8. Time to Practice [THE SHOP APP]
 ### 9. Handling User Input.
 ### 10. Http Requests & Adding a Web Server + Database
@@ -13,7 +16,7 @@ check the status of the updated product on the server
 In order to find where to send the request for authentication, google 'firebase rest auth api'
 
 
-# Packages installed:
+## Packages installed:
 ### For Section 8:
 ### redux react-redux react-navigation react-navigation-stack react-navigation-header-buttons
 ### !!! expo install react-native-gesture-handler react-native-reanimated
