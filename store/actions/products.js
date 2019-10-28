@@ -43,7 +43,8 @@ export const fetchProducts = () => {
 
 export const deleteProduct = (productId) => {
 	return async (dispatch) => {
-		const response = await fetch(`https://shop-app-bf402.firebaseio.com/products/${productId}.json`, {
+		const token = getState().auth.token;
+		const response = await fetch(`https://shop-app-bf402.firebaseio.com/products/${productId}.json?auth=${token}`, {
 			method: 'DELETE'
 		});
 
