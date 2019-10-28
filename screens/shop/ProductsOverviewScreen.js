@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { FlatList, Text, View, Button, Platform, StyleSheet, ActivityIndicator } from 'react-native';
+import { FlatList, Text, View, Button, Platform, StyleSheet, ActivityIndicator, AsyncStorage } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 
 import ProductItem from '../../components/shop/ProductItem';
 import * as cartActions from '../../store/actions/cart';
 import * as productsActions from '../../store/actions/products';
+import * as authActions from '../../store/actions/auth';
 import CustomHeaderButton from '../../components/UI/CustomHeaderButton';
 import Colours from '../../constants/Colours';
 
@@ -33,8 +34,14 @@ const ProductsOverviewScreen = (props) => {
 
 	useEffect(
 		() => {
+			const willFocusRefresh = props.navigation.addListener('willFocus', authActions.refreshing);
+
+			// Load products before focusing.
 			const willFocusEvent = props.navigation.addListener('willFocus', loadProducts);
-			return () => willFocusEvent.remove();
+			return () => {
+				willFocusRefresh.remove();
+				willFocusEvent.remove();
+			};
 		},
 		[ loadProducts ]
 	);
