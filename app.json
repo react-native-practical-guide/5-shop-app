@@ -3,7 +3,6 @@
     "name": "Shop app",
     "slug": "5-shop-app",
     "privacy": "public",
-    "sdkVersion": "34.0.0",
     "platforms": [
       "ios",
       "android",
