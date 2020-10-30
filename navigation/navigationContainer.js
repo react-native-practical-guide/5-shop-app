@@ -2,7 +2,7 @@
 // And because in startUpScreen we can not navigate to the authScreen.
 import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
-import { NavigationActions } from "react-navigation";
+import { NavigationActions, createAppContainer } from "react-navigation";
 
 import ShopNavigator from "./shopNavigator";
 
@@ -22,4 +22,4 @@ const NavigationContainer = props => {
 
 export default NavigationContainer;
 
-const AppContainer = createAppContainer(AppNavigator);
+const AppContainer = createAppContainer(ShopNavigator);
